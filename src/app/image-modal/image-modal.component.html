@@ -1,0 +1,17 @@
+<!-- image-modal.component.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Image en plein écran
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-img [src]="imageUrl"></ion-img>
+</ion-content>

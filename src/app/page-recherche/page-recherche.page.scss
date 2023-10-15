@@ -1,0 +1,21 @@
+.grad-blue {
+    --background: linear-gradient(to right, #007bff, #2196F3);
+    color: white; /* Couleur du texte */
+  }
+/* Styles pour la barre de recherche */
+
+  
+  /* Styles pour les chips */
+  ion-chip {
+    margin: 4px; /* Marge entre les chips */
+    font-size: 14px; /* Taille de la police des labels */
+    cursor: pointer; /* Curseur de la souris en main */
+  }
+  
+  /* Styles pour les chips sélectionnés */
+  ion-chip ion-label {
+    color: #fff; /* Couleur du texte pour le chip sélectionné (blanc) */
+  }
+  
+  /* Ajoutez d'autres styles si nécessaire */
+  

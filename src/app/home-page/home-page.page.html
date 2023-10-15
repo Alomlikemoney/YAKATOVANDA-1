@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar class="grad-blue">
+    <ion-title>
+      Page d'accueil
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="custom-button" expand="full" (click)="goToGestAnnoncePage()">
+        <ion-icon name="arrow-forward-circle-outline" slot="start"></ion-icon>
+        Créer une annonce
+      </ion-button>  
+      <ion-button *ngIf="!connexionReussie" (click)="goToLoginPage()" routerLink="/tabs/login-page">
+        <ion-icon name="log-in-outline"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="!inscriptionReussie" (click)="goToSignupPage()" routerLink="/tabs/signup-page">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h1>Actualités</h1>
+  <ion-card *ngFor="let annonce of annonces$ | async">
+    <ion-card-header>
+    
+    </ion-card-header>
+    <ion-card-content>
+      
+       <!-- Affichez les images depuis Firebase Storage -->
+       <ion-row>
+        <ion-col *ngFor="let imageUrl of annonce.images" >
+          <img  [src]="imageUrl" alt="Image de l'annonce" (click)="previewImage(imageUrl)">
+          
+        </ion-col>
+      </ion-row>
+
+      <ion-card-title>Informations de l'annonce</ion-card-title>
+      <p>Description : {{ annonce.description }}</p>
+      <p>Téléphone 1 : {{ annonce.phone1 }}</p>
+      <p>Téléphone 2 : {{ annonce.phone2 }}</p>
+      <p>Téléphone 3 : {{ annonce.phone3 }}</p>
+      <p>Statut : {{ annonce.statut }}</p>
+      <p>Ville : {{ annonce.ville }}</p>
+      <p>Pays : {{ annonce.pays }}</p>
+      <p>Quartier : {{ annonce.quartier }}</p>
+      <p>Référence annexes : {{ annonce.referenceAnnexes }}</p>
+      <p>Prix du bien en FCFA : {{ annonce.prix }}</p>
+      <p>Statut du prix : {{ annonce.prixStatus }}</p>
+      <p>Date de création de l'annonce : {{ annonce.dateAnciennete }}</p>
+      <p>Taille du bien : {{ annonce.taille }}</p>
+      <p>Référence annexes du bien : {{ annonce.referenceAnnexesBien }}</p>
+      <ion-button (click)="selectAnnonce(annonce)">Sélectionner</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

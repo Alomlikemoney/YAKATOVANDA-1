@@ -1,0 +1,192 @@
+<ion-header>
+  <ion-toolbar class="grad-blue">
+    <ion-title>Création d'Annonces</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-button id="open-modal" expand="block" (click)="openModal()">Créer une annonce</ion-button>
+  <p>{{ message }}</p>
+
+  <!-- Affichage des cartes d'annonces -->
+  <ion-card *ngFor="let formData of confirmedFormDatas">
+    <ion-card-header>
+      {{ formData.title }}
+      <ion-badge color="primary">Mon Annonce</ion-badge> 
+    </ion-card-header>
+   
+    <!-- Bouton de suppression -->
+    <ion-card-content> <ion-button color="danger" (click)="deleteConfirmedForm(formData)">Supprimer</ion-button> 
+      <ion-card-title>Informations de l'annonce</ion-card-title>
+      <ion-list>
+        <ion-item>
+          <ion-label>Description:</ion-label>
+          <ion-textarea readonly>{{ formData.description }}</ion-textarea>
+        </ion-item>
+        <ion-item>
+          <ion-label>Téléphone 1:</ion-label>
+          <ion-input readonly>{{ formData.phone1 }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Téléphone 2:</ion-label>
+          <ion-input readonly>{{ formData.phone2 }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Téléphone 3:</ion-label>
+          <ion-input readonly>{{ formData.phone3 }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Statut:</ion-label>
+          <ion-select [(ngModel)]="formData.statut">
+            <ion-select-option value="À débattre">À débattre</ion-select-option>
+            <ion-select-option value="Prix fixe">Prix fixe</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Ville:</ion-label>
+          <ion-input readonly>{{ formData.ville }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Pays:</ion-label>
+          <ion-input readonly>{{ formData.pays }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Quartier:</ion-label>
+          <ion-input readonly>{{ formData.quartier }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Référence annexes:</ion-label>
+          <ion-input readonly>{{ formData.referenceAnnexes }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Prix du bien en FCFA:</ion-label>
+          <ion-input readonly>{{ formData.prix }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-radio-group [(ngModel)]="formData.prixStatus">
+            <ion-item>
+              <ion-label>A débattre</ion-label>
+              <ion-radio slot="start" value="A débattre"></ion-radio>
+            </ion-item>
+            <ion-item>
+              <ion-label>Prix fixe</ion-label>
+              <ion-radio slot="start" value="Prix fixe"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+          <ion-label>Statut du prix:</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>Date de création de l'annonce:</ion-label>
+          <ion-input readonly>{{ formData.dateAnciennete }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Taille du bien:</ion-label>
+          <ion-input readonly>{{ formData.taille }}</ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Référence annexes du bien:</ion-label>
+          <ion-input readonly>{{ formData.referenceAnnexesBien }}</ion-input>
+        </ion-item>
+        <!-- Ajoutez d'autres champs ici -->
+      </ion-list>
+      <ion-row>
+        <ion-col *ngFor="let image of formData.images">
+          <img [src]="image" width="100">
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-modal #modal>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancel()">Annuler</ion-button>
+        </ion-buttons>
+        <ion-title>Créer votre annonce</ion-title>
+        <ion-buttons slot="end">
+          <ion-button [strong]="true" [disabled]="formConfirmed" (click)="confirm()">Confirmer</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+      <ion-item>
+        <ion-label position="stacked">Description <ion-text color="danger">*</ion-text>(obligatoire)::</ion-label>
+        <ion-textarea [(ngModel)]="description" rows="4" required></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Téléphone 1 <ion-text color="danger">*</ion-text> (obligatoire):</ion-label>
+        <ion-input type="tel" [(ngModel)]="phone1" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Téléphone 2:</ion-label>
+        <ion-input type="tel" [(ngModel)]="phone2"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Téléphone 3:</ion-label>
+        <ion-input type="tel" [(ngModel)]="phone3"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Statut</ion-label>
+        <ion-select [(ngModel)]="statut">
+          <ion-select-option value="Location">Location</ion-select-option>
+          <ion-select-option value="Vente">Vente</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
+        <ion-item>
+          <ion-label position="stacked">Ville:
+          <ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <ion-input type="text" [(ngModel)]="ville" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Pays:
+          <ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <ion-input type="text" [(ngModel)]="pays" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Quartier:
+      <ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <ion-input type="text" [(ngModel)]="quartier" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Référence annexes:</ion-label>
+          <ion-input type="text" [(ngModel)]="referenceAnnexes"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Prix du bien en FCFA:
+          <ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <ion-input type="number" [(ngModel)]="prix" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Statut du prix</ion-label>
+          <ion-select [(ngModel)]="prixStatus">
+            <ion-select-option value="À débattre">À débattre</ion-select-option>
+            <ion-select-option value="Prix fixe">Prix fixe</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Date de création de l'annonce: <ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <ion-input type="date" [(ngModel)]="dateAnciennete" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Taille du bien:</ion-label>
+          <ion-input type="text" [(ngModel)]="taille"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Référence annexes du bien:</ion-label>
+          <ion-input type="text" [(ngModel)]="referenceAnnexesBien"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Images (max 4):<ion-text color="danger">*</ion-text>(obligatoire):</ion-label>
+          <input type="file" (change)="addImages($event)" accept="image/*" multiple required>
+          <ion-text color="danger" *ngIf="images.length > 4">Vous ne pouvez ajouter que 4 images maximum.</ion-text>
+        </ion-item>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  

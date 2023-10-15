@@ -1,0 +1,8 @@
+{
+  "name": "Yakatovanda",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "8cd02c21"
+}

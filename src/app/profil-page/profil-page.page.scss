@@ -1,0 +1,47 @@
+/* Styles pour la barre de titre */
+ion-header {
+    ion-toolbar {
+      --ion-background-color: linear-gradient(to right, #007bff, #00bcd4); /* Dégradé bleu */
+      color: #fff; /* Couleur du texte */
+    }
+  }
+  
+  /* Styles pour la carte de profil */
+  ion-card {
+    ion-card-title {
+      text-align: center;
+    }
+  
+    ion-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  
+      .avatar {
+        width: 100px; /* Largeur de l'avatar */
+        height: 100px; /* Hauteur de l'avatar */
+      }
+  
+      ion-item {
+        ion-icon {
+          color: #007bff; /* Couleur de l'icône */
+        }
+  
+        ion-label {
+          font-size: 16px; /* Taille de la police des étiquettes */
+          margin-left: 10px; /* Marge à gauche des étiquettes */
+        }
+      }
+  
+      ion-badge {
+        margin-top: 10px; /* Marge supérieure pour le badge "En ligne" */
+        font-size: 14px; /* Taille de la police du badge */
+        text-transform: uppercase; /* Texte en majuscules */
+      }
+    }
+  }
+  .grad-blue {
+    --background: linear-gradient(to right, #007bff, #2196F3);
+    color: white; /* Couleur du texte */
+  }
+  

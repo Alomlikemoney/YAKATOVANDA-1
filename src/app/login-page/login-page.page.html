@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Connexion</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">E-mail ou numéro de téléphone</ion-label>
+      <ion-input [(ngModel)]="emailOrPhone" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Mot de passe</ion-label>
+      <ion-input [(ngModel)]="password" type="password"></ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="full" (click)="login()">Connexion</ion-button>
+  <p class="error-message">{{ errorMessage }}</p>
+  <p (click)="goToSignupPage()" class="signup-link">Pas encore de compte ?<span style="color: blue;">Inscrivez-vous.</span></p>
+</ion-content>

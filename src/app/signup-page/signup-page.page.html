@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Inscription</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="register()" #signupForm="ngForm">
+    <ion-item>
+      <ion-label position="floating">Nom</ion-label>
+      <ion-input type="text" [(ngModel)]="firstName" name="firstName" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Prénom</ion-label>
+      <ion-input type="text" [(ngModel)]="lastName" name="lastName" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Numéro de téléphone ou e-mail</ion-label>
+      <ion-input type="text" [(ngModel)]="phoneOrEmail" name="phoneOrEmail" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Mot de passe</ion-label>
+      <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Genre</ion-label>
+      <ion-select [(ngModel)]="gender" name="gender" required>
+        <ion-select-option value="male">Homme</ion-select-option>
+        <ion-select-option value="female">Femme</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button expand="full" type="submit">S'inscrire</ion-button>
+  </form>
+
+  <p (click)="goToLoginPage()" class="signup-link">
+    Vous avez déjà un compte? <span style="color: blue;">Connectez-vous.</span>
+  </p>
+  
+</ion-content>

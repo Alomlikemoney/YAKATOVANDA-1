@@ -1,0 +1,21 @@
+<!-- registration-modal.component.html -->
+
+<ion-header>
+  <ion-toolbar color="grad-blue">
+    <ion-title>Formulaire d'Inscription</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Fermer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Ajoutez ici les champs de votre formulaire d'inscription -->
+  <ion-item>
+    <ion-label position="floating">Nom</ion-label>
+    <ion-input [(ngModel)]="userData.name"></ion-input>
+  </ion-item>
+  <!-- Ajoutez d'autres champs ici selon vos besoins -->
+
+  <ion-button expand="full" color="primary" (click)="closeModal()">Valider</ion-button>
+</ion-content>

@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar class="grad-blue">
+    <ion-title>Recherche</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-searchbar color="light"></ion-searchbar>
+  <ion-chip  color="success" (click)="onChipSelect('hotel')" [color]="selectedChips.includes('hotel') ? 'primary' : ''">
+    <ion-label>Hotel</ion-label>
+  </ion-chip>
+  <ion-chip color="medium" (click)="onChipSelect('location')" [color]="selectedChips.includes('location') ? 'secondary' : ''">
+    <ion-label>Location</ion-label>
+  </ion-chip>
+  <ion-chip  color="danger" (click)="onChipSelect('venteParcelle')" [color]="selectedChips.includes('venteParcelle') ? 'tertiary' : ''">
+    <ion-label>Vente de Parcelle</ion-label>
+  </ion-chip>
+  <ion-chip color="warning" (click)="onChipSelect('terrain')" [color]="selectedChips.includes('terrain') ? 'success' : ''">
+    <ion-label>Terrain</ion-label>
+  </ion-chip>
+  <ion-chip color="tertiary" (click)="onChipSelect('appartement')" [color]="selectedChips.includes('appartement') ? 'warning' : ''">
+    <ion-label>Appartement</ion-label>
+  </ion-chip>
+  <ion-chip color="secondary" (click)="onChipSelect('parcelleAVendre')" [color]="selectedChips.includes('parcelleAVendre') ? 'danger' : ''">
+    <ion-label>Parcelle à Vendre</ion-label>
+  </ion-chip>
+</ion-content>

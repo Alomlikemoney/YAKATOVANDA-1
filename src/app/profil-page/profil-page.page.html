@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar class="grad-blue">
+    <ion-title>Profil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-avatar class="avatar">
+        <img src="URL_DE_VOTRE_IMAGE" alt="Avatar" /> <!-- Remplacez par l'URL de l'avatar -->
+      </ion-avatar>
+    </ion-card-header>
+
+    <ion-card-content>
+      
+      <ion-card-title>{{ userProfile.name }}</ion-card-title>
+
+      <ion-item>
+        <ion-icon name="call" slot="start"></ion-icon>
+        <ion-label>{{ userProfile.phone1 }}</ion-label>
+      </ion-item>
+
+      <ion-badge [color]="userProfile.onlineStatus ? 'success' : 'danger'">
+        {{ userProfile.onlineStatus ? 'En ligne' : 'Hors ligne' }}
+      </ion-badge>
+
+      <!-- Bouton de déconnexion -->
+      <ion-button expand="full" color="danger" (click)="logout()">Se Déconnecter</ion-button>
+
+      <!-- Bouton pour accéder à la page de création d'annonces -->
+      <ion-button expand="full" class="grad-blue" (click)="goToCreateAdPage()">Créer une Annonce</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
