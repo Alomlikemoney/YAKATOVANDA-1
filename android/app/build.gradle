@@ -1,6 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    defaultConfig {
+        // ...
+        minSdkVersion 5 // Modifiez cette valeur en fonction de la version minimale souhaitée
+        // ...
+    }
+
+     signingConfigs {
+        // release {
+        //     storeFile file('C:/Users/malon/Documents/FIRST/Yakatovanda/my-release-key.jks') // Le chemin vers votre keystore
+        //     storePassword 'alomlikeg1ming'      // Mot de passe du keystore
+        //     keyAlias 'YAKATOVANDA' 
+        //     keyPassword 'alomlikeg1ming'                   // Alias de la clé
+        //               // Mot de passe de la clé
+        // }
+    }
     namespace "io.ionic.starter"
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -52,3 +68,4 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+

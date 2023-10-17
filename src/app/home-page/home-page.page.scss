@@ -26,3 +26,8 @@
     background-color: linear-gradient(to right, #003366, #336699);
     color: white; /* Couleur du texte en blanc */
   }
+
+  ion-avatar {
+    width: 100px; /* Définissez la largeur souhaitée */
+    height: 100px; /* Définissez la hauteur souhaitée */
+  }

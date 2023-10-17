@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs';
 import { ListResult, Reference } from '@angular/fire/compat/storage/interfaces';
 import {ModalController } from '@ionic/angular'; // Importez ModalController
 import { SharedService } from '../shared.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-home-page',
@@ -33,7 +34,12 @@ export class HomePage {
   imagesRefs: Reference[] | undefined;
   imageUrls: Observable<string[]> | undefined;
   annonces!: Observable<any[]>;
- 
+  userImageUrls: string | undefined;
+  images: File[] = [];
+  userEmail: string = '';
+  uniqueIdCounter: number = 0;
+  uniqueCardIds: Set<number> = new Set<number>();
+  selectedCards: any[] = []; 
 
 
   constructor(private router: Router,
@@ -46,10 +52,45 @@ export class HomePage {
     private afStorage: AngularFireStorage,
     private modalController: ModalController,
     private navCtrl: NavController,
-    private sharedService: SharedService 
+    private sharedService: SharedService,
+    private afAuth: AngularFireAuth,
     ) {
+        // Récupérez l'utilisateur actuellement connecté
+    this.afAuth.authState.subscribe(user => {
+      if (user) {
+        // L'utilisateur est connecté, vous pouvez accéder à son adresse e-mail ici
+        const userEmailFromAuth = user.email;
+        if (userEmailFromAuth) {
+          // Vérifiez que l'adresse e-mail n'est pas null
+          this.userEmail = userEmailFromAuth;
+
+          // Vérifiez si userEmail contient une adresse e-mail valide
+          if (this.isValidEmail(userEmailFromAuth)) {
+            console.log('Adresse e-mail récupérée avec succès :', userEmailFromAuth);
+          } else {
+            console.error('Adresse e-mail invalide :', userEmailFromAuth);
+          }
+        }
+      } else {
+        // L'utilisateur n'est pas connecté, userEmail sera une chaîne vide
+        this.userEmail = '';
+      }
+    });
       this.storage.create();
     }
+
+
+
+
+
+    
+  // Vérifiez si une chaîne est une adresse e-mail valide
+  isValidEmail(email: string): boolean {
+    // Utilisez une expression régulière pour valider l'adresse e-mail
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
+
     ngOnInit() {
       this.annonces$ = this.firestore.collection('ANNONCES').valueChanges();
 
@@ -62,15 +103,16 @@ export class HomePage {
     }
     inscriptionReussie: boolean = false; // Par défaut, l'inscription n'est pas réussie
 
-    async ionViewWillEnter() {
-      this.inscriptionReussie = await this.storage.get('inscriptionReussie');
-      this.userName = await this.storage.get('userName');
-// Vérifiez si l'alerte a déjà été affichée
-if (!this.alerteAffichee && this.inscriptionReussie) {
-  this.presentCongratulationsAlert();
-  this.alerteAffichee = true; // Marquez l'alerte comme affichée
-}
-}
+//     async ionViewWillEnter() {
+//       this.inscriptionReussie = await this.storage.get('inscriptionReussie');
+//       this.userName = await this.storage.get('userName');
+// // Vérifiez si l'alerte a déjà été affichée
+// if (!this.alerteAffichee && this.inscriptionReussie) {
+//   this.presentCongratulationsAlert();
+//   this.alerteAffichee = true; // Marquez l'alerte comme affichée
+// }
+// }
+
  
 async ionViewWillConnect(){
   this.connexionReussie= await this.storage.get('connexionReussie');
@@ -140,14 +182,17 @@ async ionViewWillConnect(){
     document.body.appendChild(modal);
   }
 
-    selectAnnonce(annonce: any) {
-    // Ajoutez l'annonce sélectionnée à la liste à l'aide du service partagé
-  this.sharedService.addSelectedAnnonce(annonce);
-   
+// Fonction appelée lorsqu'une ion-card est sélectionnée
+  // Fonction appelée lorsqu'une ion-card est sélectionnée
+  selectCard(annonce: any) {
+    // Ajoutez la carte sélectionnée au service partagé
+    this.sharedService.addSelectedCard(annonce);
 
-    // Utilisez la navigation pour accéder à gest-annonce
-    this.router.navigate(['/tabs/gest-annonce']);
+    // Redirigez vers la page gest-annonce
+    this.navCtrl.navigateForward('/tabs/gest-annonce');
   }
 
+
+  
 }
  

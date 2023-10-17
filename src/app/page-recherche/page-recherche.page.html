@@ -5,7 +5,13 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-searchbar color="light"></ion-searchbar>
+  <ion-input
+  type="text"
+  [(ngModel)]="searchQuery"
+  (ionChange)="onSearch()"
+  placeholder="Rechercher"
+></ion-input>
+  <ion-searchbar color="light" (ionChange)="onSearch()"></ion-searchbar>
   <ion-chip  color="success" (click)="onChipSelect('hotel')" [color]="selectedChips.includes('hotel') ? 'primary' : ''">
     <ion-label>Hotel</ion-label>
   </ion-chip>
@@ -24,4 +30,26 @@
   <ion-chip color="secondary" (click)="onChipSelect('parcelleAVendre')" [color]="selectedChips.includes('parcelleAVendre') ? 'danger' : ''">
     <ion-label>Parcelle à Vendre</ion-label>
   </ion-chip>
+
+  <div *ngIf="searchResults.length > 0">
+    <ion-list>
+      <ion-card *ngFor="let result of searchResults">
+        <ion-card-header>
+          {{ result.title }}
+        </ion-card-header>
+        <ion-card-content>
+          {{ result.description }}
+        </ion-card-content>
+        <ion-button (click)="showDetails(result)">Afficher les détails</ion-button>
+      </ion-card>
+    </ion-list>
+  </div>
+
+
+  <div *ngIf="searchResults.length === 0">
+    <p>Aucun résultat trouvé.</p>
+  </div>
+  <div *ngFor="let result of searchResults" (click)="showDetails(result)">
+    <!-- Affichez les résultats sous forme d'ion-cards ici -->
+  </div>
 </ion-content>

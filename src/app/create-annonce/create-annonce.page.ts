@@ -8,6 +8,14 @@ import { NavController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { NewsService } from '../confirmed-data.service';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { ModalController } from '@ionic/angular';
+import { LoginPagePage } from '../login-page/login-page.page';
+import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { Storage } from '@ionic/storage-angular';
+import { SharedService } from '../shared.service';
+import { AnnonceService } from '../annonce-service.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-create-annonce',
@@ -18,9 +26,10 @@ export class CreateAnnoncePage {
   @ViewChild(IonModal)
   modal!: IonModal;
   userEmail: string = '';
-  
+
   // Ajoutez une propriété pour stocker le nom de la collection Firestore
   firestoreCollection: string = 'ANNONCES';
+  Nomvendeur: string | undefined;
   description: string | undefined;
   phone1: number | undefined;
   phone2: number | undefined;
@@ -36,26 +45,34 @@ export class CreateAnnoncePage {
   taille: string | undefined;
   referenceAnnexesBien: string | undefined;
   images: File[] = [];
- 
+  localAnnouncements: any[] = [];
+
   message = 'Commencez à créer votre Annonce.';
   formConfirmed = false;
   confirmedFormDatas: any[] = []; // Liste pour stocker les informations des cartes confirmées
   resetForm: any;
-  errorMessage: string='';
+  errorMessage: string = '';
   items: Observable<any[]> | undefined;
   route: any;
   afSG: any;
+  userImageUrls: string | undefined;
 
   constructor(
+    private storage: Storage,
     private firestore: AngularFirestore,
-    private storage: AngularFireStorage,
+    private firestorage: AngularFireStorage,
     private afAuth: AngularFireAuth,
     private navCtrl: NavController,
     private newsService: NewsService,
     public afDB: AngularFireDatabase,
+    private modalController: ModalController,
+    private alertController: AlertController,
+    private router: Router,
+    private sharedService: SharedService,
+    private annonceService: AnnonceService
   ) {
     // Récupérez l'utilisateur actuellement connecté
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.subscribe((user) => {
       if (user) {
         // L'utilisateur est connecté, vous pouvez accéder à son adresse e-mail ici
         const userEmailFromAuth = user.email;
@@ -77,21 +94,32 @@ export class CreateAnnoncePage {
     });
   }
 
-
-
+  ngOnInit() {
+    // ...
+    this.storage.create();
+      // Chargement des données stockées localement
+  this.storage.get('localAnnouncements').then((data) => {
+    if (data) {
+      this.localAnnouncements = data;
+    }
+  })
+  }
+  
   // Vérifiez si une chaîne est une adresse e-mail valide
   isValidEmail(email: string): boolean {
     // Utilisez une expression régulière pour valider l'adresse e-mail
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   }
-openModal() {
+
+  async openModal() {
     if (this.userEmail) {
       this.modal.present();
     } else {
-      this.errorMessage = "Vous devez vous connecter ou vous inscrire pour créer une annonce.";
+      this.router.navigate(['/tabs/login-page']);
     }
   }
+
   cancel() {
     this.modal.dismiss(null, 'cancel');
   }
@@ -100,15 +128,34 @@ openModal() {
     this.errorMessage = '';
     // Vérifiez uniquement les champs obligatoires
     if (!this.description || !this.phone1 || !this.ville || !this.pays || !this.quartier || !this.prix || !this.dateAnciennete) {
-      this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
       return;
     }
 
-// Téléversez les images dans Firebase Storage
-  const imageUrls = await this.uploadImages();
+    // Supposons que tu aies stocké l'adresse e-mail de l'utilisateur dans userEmail
+    this.firestore
+      .collection('users', (ref) => ref.where('phoneOrEmail', '==', this.userEmail))
+      .valueChanges()
+      .subscribe((userData: any[]) => {
+        if (userData.length > 0) {
+          // userData contient les informations de l'utilisateur, y compris les URLs des images de profil
+          // Assure-toi que tu stockes ces URLs dans une variable pour les afficher plus tard dans le template
+          this.userImageUrls = userData[0].imageUrls;
+          // formData.userImageUrls = this.userImageUrls;
+        }
+      });
 
+    // Téléversez les images dans Firebase Storage
+    const imageUrls = await this.uploadImages();
+
+    // Générez un ID unique pour cette annonce
+    const cardId = uuidv4();
+  // Stockez cet ID unique dans l'objet formData
+ 
     // Créez un objet pour stocker les informations de la carte actuelle
     const formData: any = {
+      id: cardId, // Utilisez l'ID généré
+      Nomvendeur: this.Nomvendeur,
       description: this.description,
       phone1: this.phone1,
       ville: this.ville,
@@ -116,9 +163,11 @@ openModal() {
       quartier: this.quartier,
       prix: this.prix,
       dateAnciennete: this.dateAnciennete,
-      userEmail:this.userEmail,
+      userEmail: this.userEmail,
+      userImageUrls: this.userImageUrls,
       images: imageUrls, // Ajoutez les liens des images
     };
+
     // Ajoutez des champs facultatifs s'ils sont remplis
     if (this.phone2) {
       formData['phone2'] = this.phone2;
@@ -147,52 +196,81 @@ openModal() {
     if (this.referenceAnnexesBien) {
       formData['referenceAnnexesBien'] = this.referenceAnnexesBien;
     }
-    // if (this.images.length < 5) {
-    //   formData['images'] = this.images;
-    // }
+   
     
-    //Ajoutez les données confirmées au service Firebase
+    // Ajoutez les données confirmées au service Firebase
     this.newsService.addNews(formData);
+// Ajoutez l'annonce à la liste locale
+this.localAnnouncements.push(formData);
+
+// Sauvegardez les données localement
+this.storage.set('localAnnouncements', this.localAnnouncements).then(() => {
+  console.log('Annonce sauvegardée localement.');
+});
+
+    // Ajoutez les données confirmées au service
+    this.annonceService.addConfirmedFormData(formData, cardId); // Passez formData et cardId
+
+    // Sauvegardez les données de l'annonce en local
+    this.storage.get('annonces').then((annonces: any[]) => {
+      if (!annonces) {
+        annonces = [];
+      }
+      annonces.push(formData); // Ajoutez l'annonce à la liste locale
+
+      this.storage.set('annonces', annonces).then(() => {
+        console.log('Annonce sauvegardée en local.');
+      });
+
+      // Fermez le modal
+      this.modalController.dismiss();
 
       // Réinitialisez les valeurs du formulaire après la confirmation
-        this.description = '';
-        this.phone1 = undefined;
-        this.phone2 = undefined;
-        this.phone3 = undefined;
-        this.statut = '';
-        this.ville = '';
-        this.pays = '';
-        this.quartier = '';
-        this.referenceAnnexes = '';
-        this.prix = undefined;
-        this.prixStatus = '';
-        this.dateAnciennete = '';
-        this.taille = '';
-        this.referenceAnnexesBien = '';
-        this.images = [];
-        this.formConfirmed = false;
-        this.userEmail;
-        this.images = [];
-        
-        this.firestore.collection(this.firestoreCollection).add(formData)
-        .then((docRef) => {
-          // Succès, le document a été enregistré avec un ID généré automatiquement
-          // Stockez également l'ID du document dans l'objet formData
-          formData['documentId'] = docRef.id; // Ajoutez cette ligne
-          this.confirmedFormDatas.push(formData); // Ajoutez les données à la liste
-      
-          // Réinitialisez les valeurs du formulaire
-          // ...
-      
-          this.modal.dismiss(formData, 'confirm');
-        })
-        .catch((error) => {
-          console.error("Erreur Firebase :", error);
-          // Traitez l'erreur ici, vous pouvez consulter la console pour plus d'informations sur l'erreur Firebase.
-        });
-      
+      this.Nomvendeur = '';
+      this.description = '';
+      this.phone1 = undefined;
+      this.phone2 = undefined;
+      this.phone3 = undefined;
+      this.statut = '';
+      this.ville = '';
+      this.pays = '';
+      this.quartier = '';
+      this.referenceAnnexes = '';
+      this.prix = undefined;
+      this.prixStatus = '';
+      this.dateAnciennete = '';
+      this.taille = '';
+      this.referenceAnnexesBien = '';
+      this.images = [];
+      this.formConfirmed = false;
+      this.userEmail;
+      this.images = [];
+    });
+
+
+    formData['documentId'] = cardId;
+
+    this.firestore
+      .collection(this.firestoreCollection)
+      .add(formData)
+      .then((docRef) => {
+        // Succès, le document a été enregistré avec un ID généré automatiquement
+        // Stockez également l'ID du document dans l'objet formData
+        formData['documentId'] = docRef.id; // Ajoutez cette ligne
+        this.confirmedFormDatas.push(formData); // Ajoutez les données à la liste
+   
+        // Réinitialisez les valeurs du formulaire
+        // ...
+
+        this.modal.dismiss(formData, 'confirm');
+      })
+      .catch((error) => {
+        console.error('Erreur Firebase :', error);
+        // Traitez l'erreur ici, vous pouvez consulter la console pour plus d'informations sur l'erreur Firebase.
+      });
+
+    // Fonction appelée lorsqu'une ion-card est sélectionnée
   }
-  
 
   addImages(event: Event) {
     const inputElement = event.target as HTMLInputElement;
@@ -207,7 +285,6 @@ openModal() {
     return !!this.description && !!this.phone1 && !!this.ville && !!this.pays && !!this.quartier && !!this.prix && !!this.dateAnciennete;
   }
 
-
   async uploadImages(): Promise<string[]> {
     const imageUrls: string[] | PromiseLike<string[]> = [];
 
@@ -217,7 +294,7 @@ openModal() {
       const filePath = `images/${fileName}`;
 
       // Téléversez l'image dans Firebase Storage
-      const task = this.storage.upload(filePath, image);
+      const task = this.firestorage.upload(filePath, image);
 
       // Attendez la fin de l'envoi
       await task.then(async (snapshot) => {
@@ -231,27 +308,47 @@ openModal() {
 
     return imageUrls;
   }
-  
-  
+
   // Modifiez la fonction deleteConfirmedForm pour supprimer un document spécifique de Firestore
-  // en utilisant son ID, et supprimer l'élément du tableau pour mettre à jour l'interface utilisateur
   deleteConfirmedForm(formData: any) {
     // Vérifiez si formData a un documentId
     if (formData.documentId) {
       // Utilisez le nom de la collection spécifiée
-      this.firestore.collection(this.firestoreCollection).doc(formData.documentId).delete()
+      this.firestore
+        .collection(this.firestoreCollection)
+        .doc(formData.documentId)
+        .delete()
         .then(() => {
           // Suppression réussie
-          const index = this.confirmedFormDatas.findIndex(data => data.documentId === formData.documentId);
+          const index = this.confirmedFormDatas.findIndex((data) => data.documentId === formData.documentId);
           if (index !== -1) {
             // Supprimez l'élément du tableau
             this.confirmedFormDatas.splice(index, 1);
           }
+            // Supprimez également l'élément du tableau des données stockées localement
+        const localIndex = this.localAnnouncements.findIndex((localData) => localData.documentId === formData.documentId);
+        if (localIndex !== -1) {
+          this.localAnnouncements.splice(localIndex, 1);
+        }
         })
-        .catch((error) => {
-          console.error("Erreur Firebase :", error);
-          // Gérez l'erreur ici
+
+           // Supprimez l'annonce du stockage local
+    this.storage.get('localAnnouncements').then((data) => {
+      if (data) {
+        const filteredData = data.filter((localData: any) => localData.documentId !== formData.documentId);
+        this.storage.set('localAnnouncements', filteredData).then(() => {
+          console.log('Annonce locale supprimée avec succès.');
         });
-    }
+      }
+    });
+        // Supprimez également l'élément du DOM
+        const elementToRemove = document.querySelector(`.annonce[data-id="${formData.documentId}"]`);
+        if (elementToRemove) {
+          elementToRemove.remove();
+        }
+      }
+      
   }
-}
+      
+    }
+ 

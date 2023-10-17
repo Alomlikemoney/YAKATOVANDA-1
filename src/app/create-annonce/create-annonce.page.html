@@ -8,17 +8,32 @@
   <ion-button id="open-modal" expand="block" (click)="openModal()">Créer une annonce</ion-button>
   <p>{{ message }}</p>
 
+
+
+
+
   <!-- Affichage des cartes d'annonces -->
-  <ion-card *ngFor="let formData of confirmedFormDatas">
+  <ion-card *ngFor="let formData of localAnnouncements">
     <ion-card-header>
       {{ formData.title }}
       <ion-badge color="primary">Mon Annonce</ion-badge> 
     </ion-card-header>
-   
+    <ion-grid>
+      <ion-row>
+        <ion-avatar *ngFor="let imageUrl2 of userImageUrls">
+          <img [src]="imageUrl2" alt="Image de profil">
+        </ion-avatar>
+        
+      </ion-row>
+    </ion-grid>
     <!-- Bouton de suppression -->
     <ion-card-content> <ion-button color="danger" (click)="deleteConfirmedForm(formData)">Supprimer</ion-button> 
       <ion-card-title>Informations de l'annonce</ion-card-title>
       <ion-list>
+        <ion-item>
+          <ion-label>Nom du vendeur(euse):</ion-label>
+          <ion-textarea readonly>{{ formData.Nomvendeur }}</ion-textarea>
+        </ion-item>
         <ion-item>
           <ion-label>Description:</ion-label>
           <ion-textarea readonly>{{ formData.description }}</ion-textarea>
@@ -96,6 +111,11 @@
       </ion-row>
     </ion-card-content>
   </ion-card>
+
+
+
+
+  
 </ion-content>
 
 <ion-modal #modal>
@@ -113,7 +133,10 @@
     </ion-header>
     <ion-content class="ion-padding">
       <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-
+      <ion-item>
+        <ion-label position="stacked">Nom du vendeur <ion-text color="danger">*</ion-text>(obligatoire)::</ion-label>
+        <ion-textarea [(ngModel)]="Nomvendeur" rows="4" required></ion-textarea>
+      </ion-item>
       <ion-item>
         <ion-label position="stacked">Description <ion-text color="danger">*</ion-text>(obligatoire)::</ion-label>
         <ion-textarea [(ngModel)]="description" rows="4" required></ion-textarea>
@@ -189,4 +212,6 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+
   

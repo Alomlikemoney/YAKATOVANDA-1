@@ -1,3 +1,4 @@
+import { SharedService } from './shared.service';
 import { environment } from './../environments/environment.prod';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -36,7 +37,7 @@ export const firebaseConfig = {
     AngularFireStorageModule,
     IonicStorageModule.forRoot(),
     BrowserModule, IonicModule.forRoot(), FormsModule,  AppRoutingModule, IonicModule.forRoot()],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [SharedService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 
 })

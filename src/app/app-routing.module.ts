@@ -34,6 +34,10 @@ const routes: Routes = [
   {
     path: 'gest-annonce',
     loadChildren: () => import('./gest-annonce/gest-annonce.module').then( m => m.GestAnnoncePageModule)
+  },
+  {
+    path: 'mes-annonces',
+    loadChildren: () => import('./mes-annonces/mes-annonces.module').then( m => m.MesAnnoncesPageModule)
   }
 ],
 },
@@ -46,6 +50,10 @@ const routes: Routes = [
     path: 'login-page',
     loadChildren: () => import('./login-page/login-page.module').then( m => m.LoginPagePageModule)
   },
+  {
+    path: 'mes-annonces',
+    loadChildren: () => import('./mes-annonces/mes-annonces.module').then( m => m.MesAnnoncesPageModule)
+  }
  
 
 ];

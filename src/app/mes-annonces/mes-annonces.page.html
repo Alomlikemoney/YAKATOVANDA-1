@@ -1,33 +1,26 @@
 <ion-header>
   <ion-toolbar class="grad-blue">
     <ion-title>
-   Accueil
+    Annonces
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button class="custom-button" expand="full" (click)="goToGestAnnoncePage()">
-        <ion-icon name="arrow-forward-circle-outline" slot="start"></ion-icon>
-        Créer une annonce
-      </ion-button>  
-      <ion-button *ngIf="!connexionReussie" (click)="goToLoginPage()" routerLink="/tabs/login-page">
-        <ion-icon name="log-in-outline"></ion-icon>
-      </ion-button>
-      <ion-button *ngIf="!inscriptionReussie" (click)="goToSignupPage()" routerLink="/tabs/signup-page">
-        <ion-icon name="person-add-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">mes-annonces</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
 
 
-<ion-content class="ion-padding">
-  
-  <h1>Actualités</h1>
-  <ion-card *ngFor="let annonce of annonces$ | async">
-    <ion-card-header>
     
-    </ion-card-header>
-    <ion-card-content  *ngIf="!userImageUrls" >
+    <ion-card *ngFor="let annonce of confirmedFormDatas"  [id]="annonce.documentId">
+
+      <!-- <ion-button color="danger" (click)="deleteIonCard(annonce.documentId)">Supprimer</ion-button> -->
+      <!-- Affichez les données de l'annonce ici -->
        <!-- Afficher les images de profil depuis Firebase Firestore -->
        <ion-grid>
         <ion-row>
@@ -55,7 +48,7 @@
       </ion-row>
 
       <ion-card-title>Informations de l'annonce</ion-card-title>
-      
+      <!-- <p>Identifiant de l'annonce : {{ annonce.id }}</p>  -->
       <p>Description : {{ annonce.description }}</p>
       <p>Téléphone 1 : {{ annonce.phone1 }}</p>
       <p>Téléphone 2 : {{ annonce.phone2 }}</p>
@@ -71,9 +64,7 @@
       <p>Taille du bien : {{ annonce.taille }}</p>
       <p>Référence annexes du bien : {{ annonce.referenceAnnexesBien }}</p>
         <!-- Ajoutez un lien vers la page "gest-annonce" avec les détails de l'annonce -->
-  <a [routerLink]="['/tabs/gest-annonce', annonce.id]">
-
-    <ion-button (click)="selectCard(annonce)">Sélectionner</ion-button> </a>
-    </ion-card-content>
-  </ion-card>
+    </ion-card>
+  </ion-content>
+  
 </ion-content>

@@ -6,6 +6,21 @@
 
 <ion-content class="ion-padding">
   <form (ngSubmit)="register()" #signupForm="ngForm">
+
+  <!-- Champ de fichier pour sélectionner l'image -->
+  <ion-item>
+    <ion-label>Importer votre photo de profil</ion-label>
+    <input type="file" (change)="onImageSelected($event)" accept="image/*" multiple>
+  </ion-item>
+  <ion-col *ngFor="let image of imageUrls">
+  <!-- Affichez l'avatar (image sélectionnée) -->
+  <ion-item *ngIf="selectedImage">
+    <ion-avatar slot="start">
+      <img [src]="selectedImageURL" alt="Avatar" name="images">
+    </ion-avatar>
+  </ion-item>
+</ion-col>
+
     <ion-item>
       <ion-label position="floating">Nom</ion-label>
       <ion-input type="text" [(ngModel)]="firstName" name="firstName" required></ion-input>
@@ -37,8 +52,8 @@
     <ion-button expand="full" type="submit">S'inscrire</ion-button>
   </form>
 
-  <p (click)="goToLoginPage()" class="signup-link">
-    Vous avez déjà un compte? <span style="color: blue;">Connectez-vous.</span>
-  </p>
+  <p (click)="goToLoginPage()" class="signup-link"> Vous avez déjà un compte? <span style="color: blue;">Connectez-vous.</span></p>
+
+  
   
 </ion-content>

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar class="grad-blue">
     <ion-title>
-    Mes Annonces
+    Favoris
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -10,37 +10,59 @@
 
     
     <!-- Utilisez *ngFor pour itérer à travers les annonces -->
-    <ion-card *ngFor="let annonce of selectedAnnonces.reverse()">
+    <ion-card *ngFor="let annonce of selectedCards; let i = index">
       <ion-card-header>
        
       </ion-card-header>
       <ion-card-content>
+
+
          <!-- Ajoutez un bouton pour supprimer l'ion-card -->
-         <ion-button color="danger" (click)="supprimerAnnonce(annonce)">Supprimer</ion-button>
-          
-        <!-- Ajoutez une balise <img> pour afficher l'image de l'annonce -->
-        <!-- <img [src]="annonce['images']" alt="Image de l'annonce" > -->
-        <ion-row>
-        <ion-col *ngFor="let imageUrl of annonce['images'] " >
+   <!-- Bouton pour supprimer des favoris -->
+      <ion-button color="danger"  (click)="supprimerCard(i)">Supprimer des favoris</ion-button>        
+        
+         <ion-grid>
+          <ion-row>
+            <ion-col size="7" *ngFor="let imageUrlProfile of annonce.userImageUrls">
+              <ion-avatar>
+                <img [src]="imageUrlProfile" alt="Image de profil">      
+              </ion-avatar>
+              
+            </ion-col>
+            
+        </ion-row>
+        <ion-badge class="grad-blue">
+          Nom vendeur(euse) : {{ annonce.Nomvendeur }}
+        </ion-badge>
+      </ion-grid>
+
+
+
+       <!-- Affichez les images depuis Firebase Storage -->
+       <ion-row>
+        <ion-col *ngFor="let imageUrl of annonce.images" >
           <img  [src]="imageUrl" alt="Image de l'annonce" (click)="previewImage(imageUrl)">
           
         </ion-col>
       </ion-row>
-        <p>Description : {{ annonce['description'] }}</p>
-        <p>Téléphone 1 : {{ annonce['phone1'] }}</p>
-        <p>Téléphone 2 : {{ annonce['phone2']}}</p>
-        <p>Téléphone 3 : {{ annonce['phone3']}}</p>
-        <p>Statut : {{ annonce['statut ']}}</p>
-        <p>Ville : {{ annonce['ville'] }}</p>
-        <p>Pays : {{ annonce['pays'] }}</p>
-        <p>Quartier : {{ annonce['quartier'] }}</p>
-        <p>Référence annexes : {{ annonce['referenceAnnexes'] }}</p>
-        <p>Prix du bien en FCFA : {{ annonce['prix'] }}</p>
-        <p>Statut du prix : {{ annonce['prixStatus'] }}</p>
-        <p>Date de création de l'annonce : {{ annonce['dateAnciennete'] }}</p>
-        <p>Taille du bien : {{ annonce['taille'] }}</p>
-        <p>Référence annexes du bien : {{ annonce['referenceAnnexesBien'] }}</p>
 
+      <ion-card-title>Informations de l'annonce</ion-card-title>
+      
+      <p>Description : {{ annonce.description }}</p>
+      <p>Téléphone 1 : {{ annonce.phone1 }}</p>
+      <p>Téléphone 2 : {{ annonce.phone2 }}</p>
+      <p>Téléphone 3 : {{ annonce.phone3 }}</p>
+      <p>Statut : {{ annonce.statut }}</p>
+      <p>Ville : {{ annonce.ville }}</p>
+      <p>Pays : {{ annonce.pays }}</p>
+      <p>Quartier : {{ annonce.quartier }}</p>
+      <p>Référence annexes : {{ annonce.referenceAnnexes }}</p>
+      <p>Prix du bien en FCFA : {{ annonce.prix }}</p>
+      <p>Statut du prix : {{ annonce.prixStatus }}</p>
+      <p>Date de création de l'annonce : {{ annonce.dateAnciennete }}</p>
+      <p>Taille du bien : {{ annonce.taille }}</p>
+      <p>Référence annexes du bien : {{ annonce.referenceAnnexesBien }}</p>
+        
       </ion-card-content>
     </ion-card>
 

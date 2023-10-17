@@ -1,21 +1,30 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="grad-blue">
     <ion-title>Connexion</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-label position="stacked">E-mail ou numéro de téléphone</ion-label>
-      <ion-input [(ngModel)]="emailOrPhone" type="text"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Mot de passe</ion-label>
-      <ion-input [(ngModel)]="password" type="password"></ion-input>
-    </ion-item>
-  </ion-list>
+  <!-- <ion-item>
+    <ion-label>Connexion avec</ion-label>
+    <ion-select [(ngModel)]="loginWith">
+      <ion-select-option value="email">E-mail</ion-select-option>
+      <ion-select-option value="phone">Numéro de téléphone</ion-select-option>
+    </ion-select>
+  </ion-item>
+   -->
+  <ion-item>
+    <ion-label position="stacked">Identifiant</ion-label>
+    <ion-input [(ngModel)]="emailOrPhone" type="text"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Mot de passe</ion-label>
+    <ion-input [(ngModel)]="password" type="password"></ion-input>
+  </ion-item>
+
+
   <ion-button expand="full" (click)="login()">Connexion</ion-button>
   <p class="error-message">{{ errorMessage }}</p>
+  <p> Vous devez vous connecter pour créer une annonce!</p>
   <p (click)="goToSignupPage()" class="signup-link">Pas encore de compte ?<span style="color: blue;">Inscrivez-vous.</span></p>
 </ion-content>

@@ -16,7 +16,7 @@ export class LoginPagePage {
   password: string = '';
   errorMessage: string = '';
   userEmail: string = '';
-
+  loginWith: string = 'email';
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -34,6 +34,9 @@ export class LoginPagePage {
 
   
   async login() {
+
+    const identifier = this.loginWith === 'phone' ? `${this.emailOrPhone}@myapp.com` : this.emailOrPhone;
+
     try {
       if (!this.emailOrPhone || !this.password) {
         this.errorMessage = 'Veuillez remplir tous les champs.';
@@ -119,3 +122,4 @@ export class LoginPagePage {
     this.router.navigate(['/tabs/signup-page']);
   }
 }
+

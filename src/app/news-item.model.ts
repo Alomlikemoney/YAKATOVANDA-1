@@ -15,6 +15,9 @@ export interface NewsItem {
     taille?: string;
     referenceAnnexesBien?: string;
     images: string[];
+    userImageUrls: string[];
+    confirmedFormDatas: string[];
+
 
     // Ajoutez ici d'autres propriétés nécessaires pour représenter un élément d'actualité
 }
