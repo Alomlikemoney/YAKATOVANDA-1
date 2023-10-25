@@ -13,7 +13,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { Server } from 'https';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
+import { ReversePipe } from './mes-annonces/reverse.pipe';
     import { HttpClientModule } from '@angular/common/http';
 import {TabsComponent} from './tabs/tabs.component'
 
@@ -29,7 +29,7 @@ export const firebaseConfig = {
 };
 
 @NgModule({
-  declarations: [AppComponent, TabsComponent],
+  declarations: [ReversePipe,AppComponent, TabsComponent],
   imports: [AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireDatabaseModule,
     HttpClientModule,

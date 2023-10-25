@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AnnonceService } from '../annonce-service.service';
-
+import { ReversePipe } from './reverse.pipe';
 
 @Component({
   selector: 'app-mes-annonces',
@@ -35,10 +35,16 @@ export class MesAnnoncesPage implements OnInit {
      }
 
       ngOnInit() {
-        this.sharedService.getSelectedCards().subscribe((cards) => {
-          this.selectedCards = cards;
-        });
-      }
+  this.sharedService.getSelectedCards().subscribe((cards) => {
+    this.selectedCards = cards;
+  });
+
+  // Triez confirmedFormDatas par dateAnciennete en ordre décroissant
+  this.confirmedFormDatas.sort((a, b) => {
+    return new Date(b.dateAnciennete).getTime() - new Date(a.dateAnciennete).getTime();
+  });
+}
+
       previewImage(imageUrl: string) {
         // Créer un élément d'image
         const preview = document.createElement('img');

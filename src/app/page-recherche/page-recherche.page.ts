@@ -1,5 +1,12 @@
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Observable, of } from 'rxjs'; // Assurez-vous d'importer "of" depuis "rxjs"
+import { SharedService } from '../shared.service';
+import { NavController } from '@ionic/angular';
+ // Exemple avec mergeMap (assurez-vous d'importer mergeMap depuis 'rxjs/operators')
+ import { mergeMap } from 'rxjs/operators';
+ import { map } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-page-recherche',
@@ -7,54 +14,88 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
   styleUrls: ['./page-recherche.page.scss'],
 })
 export class PageRecherchePage {
-  selectedChips: string[] = [];
-  searchResults: any[] = [];
+  categories: string[] = ['Maison à vendre', 'Location', 'Vente', 'Bien immobilier', 'Maison', 'Hôtel', 'Terrain'];
+  selectedCategory: string | null = null;
   searchQuery: string = '';
+  annonces$: Observable<any[]> = of([]); // Initialisation avec un Observable vide
+  imageUrls: Observable<string[]> | undefined;
+  userImageUrls: string | undefined;
 
-  constructor(private firestore: AngularFirestore) {}
 
-  onChipSelect(chip: string) {
-    if (this.selectedChips.includes(chip)) {
-      this.selectedChips = this.selectedChips.filter((c) => c !== chip);
-    } else {
-      this.selectedChips.push(chip);
+  constructor(private firestore: AngularFirestore,  
+     private sharedService: SharedService,
+     private navCtrl: NavController,) {}
+    //  fonction de recherche depuis frestore
+     onSearch() {
+      const searchQueryLower = this.searchQuery.toLowerCase();
+    
+      this.annonces$ = this.firestore.collection('ANNONCES').valueChanges()
+        .pipe(
+          map((annonces: any[]) => {
+            return annonces.filter(annonce => {
+              const descriptionMatch = annonce.description && annonce.description.toLowerCase().includes(searchQueryLower);
+              const nomVendeurMatch = annonce.Nomvendeur && annonce.Nomvendeur.toLowerCase().includes(searchQueryLower);
+              const prixMatch = annonce.prix && annonce.prix.toString().includes(searchQueryLower);
+              const quartierMatch = annonce.quartier && annonce.quartier.toLowerCase().includes(searchQueryLower);
+              const paysMatch = annonce.pays && annonce.pays.toLowerCase().includes(searchQueryLower);
+              const villeMatch = annonce.ville && annonce.ville.toLowerCase().includes(searchQueryLower);
+              const phone1Match = annonce.phone1 && annonce.phone1.toString().includes(searchQueryLower);
+              const phone2Match = annonce.phone2 && annonce.phone2.toString().includes(searchQueryLower);
+              const phone3Match = annonce.phone3 && annonce.phone3.toString().includes(searchQueryLower);
+              const statutMatch = annonce.statut && annonce.statut.toLowerCase().includes(searchQueryLower);
+              
+              return descriptionMatch || nomVendeurMatch || prixMatch || quartierMatch ||
+                paysMatch || villeMatch || phone1Match || phone2Match || phone3Match || statutMatch;
+            });
+          })
+        );
     }
-  }
+    
+    
 
-  performSearch() {
-    // Utilisez les valeurs dans this.selectedChips pour construire la requête Firestore
-    // Par exemple, pour une recherche basée sur le type "hotel" :
-    this.firestore
-      .collection('ANNONCES', (ref) => ref.where('type', '==', 'hotel'))
-      .valueChanges()
-      .subscribe((results) => {
-        // Traitez les résultats ici, par exemple, mettez-les dans une propriété du composant
-        this.searchResults = results;
-      });
-  }
-  
-  async onSearch() {
-    if (this.searchQuery.trim() !== '') {
-      this.firestore
-        .collection('ANNONCES', (ref) =>
-          ref
-            .where('NomVendeur', '>=', this.searchQuery)
-            .where('description', '<=', this.searchQuery + '\uf8ff')
-            // Remplacez 'votreChampDeRecherche' par le nom du champ que vous souhaitez rechercher
-        )
-        .valueChanges()
-        .subscribe((results) => {
-          this.searchResults = results;
-        });
-    } else {
-      this.searchResults = [];
+
+    filterByCategory(category: string | null) {
+      this.selectedCategory = category;
+      this.onSearch();
     }
+
+  selectCard(annonce: any) {
+    // Ajoutez la carte sélectionnée au service partagé
+    this.sharedService.addSelectedCard(annonce);
+
+    // Redirigez vers la page gest-annonce
+    this.navCtrl.navigateForward('/tabs/gest-annonce');
   }
 
-  showDetails(result: any) {
-    // Implémentez ici la logique pour afficher les détails de l'élément sélectionné.
-    console.log('Détails de l\'élément :', result);
-  }
+  previewImage(imageUrl: string) {
+    // Créer un élément d'image
+    const preview = document.createElement('img');
+    preview.src = imageUrl;
+    preview.style.maxWidth = '100%';
+    preview.style.maxHeight = '100%';
   
+    // Créer une boîte de dialogue modale pour afficher l'image
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+  
+    // Ajouter l'image à la boîte de dialogue modale
+    modal.appendChild(preview);
+  
+    // Fermer la boîte de dialogue modale lorsqu'on clique dessus
+    modal.addEventListener('click', () => {
+      modal.remove();
+    });
+  
+    // Ajouter la boîte de dialogue modale à la fin du corps du document
+    document.body.appendChild(modal);
+  }
+
 }
-

@@ -1,3 +1,4 @@
+<!-- page-recherche.page.html -->
 <ion-header>
   <ion-toolbar class="grad-blue">
     <ion-title>Recherche</ion-title>
@@ -5,51 +6,69 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-input
-  type="text"
-  [(ngModel)]="searchQuery"
-  (ionChange)="onSearch()"
-  placeholder="Rechercher"
-></ion-input>
-  <ion-searchbar color="light" (ionChange)="onSearch()"></ion-searchbar>
-  <ion-chip  color="success" (click)="onChipSelect('hotel')" [color]="selectedChips.includes('hotel') ? 'primary' : ''">
-    <ion-label>Hotel</ion-label>
+  
+  
+  <ion-searchbar  [(ngModel)]="searchQuery" color="light" (ionChange)="onSearch()"></ion-searchbar>
+<ion-chip *ngFor="let category of categories" (click)="filterByCategory(category)"
+    [color]="selectedCategory === category ? 'primary' : 'light'">
+    <ion-label>{{ category }}</ion-label>
   </ion-chip>
-  <ion-chip color="medium" (click)="onChipSelect('location')" [color]="selectedChips.includes('location') ? 'secondary' : ''">
-    <ion-label>Location</ion-label>
-  </ion-chip>
-  <ion-chip  color="danger" (click)="onChipSelect('venteParcelle')" [color]="selectedChips.includes('venteParcelle') ? 'tertiary' : ''">
-    <ion-label>Vente de Parcelle</ion-label>
-  </ion-chip>
-  <ion-chip color="warning" (click)="onChipSelect('terrain')" [color]="selectedChips.includes('terrain') ? 'success' : ''">
-    <ion-label>Terrain</ion-label>
-  </ion-chip>
-  <ion-chip color="tertiary" (click)="onChipSelect('appartement')" [color]="selectedChips.includes('appartement') ? 'warning' : ''">
-    <ion-label>Appartement</ion-label>
-  </ion-chip>
-  <ion-chip color="secondary" (click)="onChipSelect('parcelleAVendre')" [color]="selectedChips.includes('parcelleAVendre') ? 'danger' : ''">
-    <ion-label>Parcelle à Vendre</ion-label>
-  </ion-chip>
+ 
+    <ion-card *ngFor="let annonce of annonces$ | async">
+      <ion-card-content  *ngIf="!userImageUrls" >
+        <!-- Afficher les images de profil depuis Firebase Firestore -->
+        <ion-grid>
+         <ion-row>
+           <ion-col size="7" *ngFor="let imageUrlProfile of annonce.userImageUrls">
+             <ion-avatar>
+               <img [src]="imageUrlProfile" alt="Image de profil">      
+             </ion-avatar>
+             
+           </ion-col>
+         
+         </ion-row>
+         <ion-badge class="grad-blue">
+           Nom vendeur(euse) : {{ annonce.Nomvendeur }}
+         </ion-badge>
+       </ion-grid>
+ 
+ 
+ 
+        <!-- Affichez les images depuis Firebase Storage -->
+        <ion-row>
+         <ion-col *ngFor="let imageUrl of annonce.images" >
+           <img  [src]="imageUrl" alt="Image de l'annonce" (click)="previewImage(imageUrl)">
+           
+         </ion-col>
+       </ion-row>
+ 
+       <ion-card-title>Informations de l'annonce</ion-card-title>
+       
+       <p>Description : {{ annonce.description }}</p>
+       <p>Téléphone 1 : {{ annonce.phone1 }}</p>
+       <p>Téléphone 2 : {{ annonce.phone2 }}</p>
+       <p>Téléphone 3 : {{ annonce.phone3 }}</p>
+       <p>Statut : {{ annonce.statut }}</p>
+       <p>Ville : {{ annonce.ville }}</p>
+       <p>Pays : {{ annonce.pays }}</p>
+       <p>Quartier : {{ annonce.quartier }}</p>
+       <p>Référence annexes : {{ annonce.referenceAnnexes }}</p>
+       <p>Prix du bien en FCFA : {{ annonce.prix }}</p>
+       <p>Statut du prix : {{ annonce.prixStatus }}</p>
+       <p>Date de création de l'annonce : {{ annonce.dateAnciennete }}</p>
+       <p>Taille du bien : {{ annonce.taille }}</p>
+       <p>Référence annexes du bien : {{ annonce.referenceAnnexesBien }}</p>
+         <!-- Ajoutez un lien vers la page "gest-annonce" avec les détails de l'annonce -->
+   <a [routerLink]="['/tabs/gest-annonce', annonce.id]">
+ 
+     <ion-button (click)="selectCard(annonce)">Sélectionner</ion-button> </a>
+     </ion-card-content>
+   </ion-card>
 
-  <div *ngIf="searchResults.length > 0">
-    <ion-list>
-      <ion-card *ngFor="let result of searchResults">
-        <ion-card-header>
-          {{ result.title }}
-        </ion-card-header>
-        <ion-card-content>
-          {{ result.description }}
-        </ion-card-content>
-        <ion-button (click)="showDetails(result)">Afficher les détails</ion-button>
-      </ion-card>
-    </ion-list>
-  </div>
 
 
-  <div *ngIf="searchResults.length === 0">
+  <div *ngIf="(annonces$ | async)?.length === 0">
     <p>Aucun résultat trouvé.</p>
   </div>
-  <div *ngFor="let result of searchResults" (click)="showDetails(result)">
-    <!-- Affichez les résultats sous forme d'ion-cards ici -->
-  </div>
+  
 </ion-content>

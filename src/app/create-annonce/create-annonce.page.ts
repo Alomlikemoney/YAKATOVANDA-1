@@ -16,6 +16,9 @@ import { Storage } from '@ionic/storage-angular';
 import { SharedService } from '../shared.service';
 import { AnnonceService } from '../annonce-service.service';
 import { v4 as uuidv4 } from 'uuid';
+import { QuerySnapshot } from 'firebase/firestore';
+import { from } from 'rxjs';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
 
 @Component({
   selector: 'app-create-annonce',
@@ -56,6 +59,8 @@ export class CreateAnnoncePage {
   route: any;
   afSG: any;
   userImageUrls: string | undefined;
+  documentIds: string[] = [];
+  sortedLocalAnnouncements: any[] = [];;
 
   constructor(
     private storage: Storage,
@@ -92,6 +97,20 @@ export class CreateAnnoncePage {
         this.userEmail = '';
       }
     });
+
+
+ // Triez le tableau localAnnouncements par la date la plus récente en premier
+ this.localAnnouncements.sort((a, b) => {
+  const dateA = new Date(a.dateAnciennete);
+  const dateB = new Date(b.dateAnciennete);
+
+  return dateB.getTime() - dateA.getTime();
+});
+
+// Inversez le tableau pour afficher les plus récentes en premier
+this.localAnnouncements.reverse();
+
+
   }
 
   ngOnInit() {
@@ -101,8 +120,23 @@ export class CreateAnnoncePage {
   this.storage.get('localAnnouncements').then((data) => {
     if (data) {
       this.localAnnouncements = data;
-    }
+      // Triez le tableau ici du plus récent au plus ancien
+      this.sortedLocalAnnouncements = this.localAnnouncements.slice().sort((a, b) => (a.dateAnciennete > b.dateAnciennete ? -1 : 1));
+    } 
   })
+
+    // Triez le tableau localAnnouncements en fonction de dateAnciennete dans l'ordre décroissant
+    this.localAnnouncements.sort((a, b) => {
+      return new Date(b.dateAnciennete).getTime() - new Date(a.dateAnciennete).getTime();
+    });
+
+  // Récupérez l'ID du document depuis le stockage local
+  const documentId = localStorage.getItem('documentId');
+
+  if (documentId) {
+    // Utilisez cet ID pour supprimer le document lorsque vous en avez besoin
+    this.deleteConfirmedForm({ documentId: documentId }); // Appelez deleteConfirmedForm avec l'ID stocké
+  }
   }
   
   // Vérifiez si une chaîne est une adresse e-mail valide
@@ -128,9 +162,14 @@ export class CreateAnnoncePage {
     this.errorMessage = '';
     // Vérifiez uniquement les champs obligatoires
     if (!this.description || !this.phone1 || !this.ville || !this.pays || !this.quartier || !this.prix || !this.dateAnciennete) {
-      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
-      return;
+      const alert = await this.alertController.create({
+        header: 'Champs obligatoires non remplis',
+        message: 'Veuillez remplir tous les champs obligatoires marqués d\'une astérisque (*).',
+        buttons: ['OK']
+      });
+      await alert.present();
     }
+    
 
     // Supposons que tu aies stocké l'adresse e-mail de l'utilisateur dans userEmail
     this.firestore
@@ -200,6 +239,9 @@ export class CreateAnnoncePage {
     
     // Ajoutez les données confirmées au service Firebase
     this.newsService.addNews(formData);
+       // Stockez l'ID du document Firestore localement
+       this.documentIds.push(cardId);
+
 // Ajoutez l'annonce à la liste locale
 this.localAnnouncements.push(formData);
 
@@ -245,6 +287,7 @@ this.storage.set('localAnnouncements', this.localAnnouncements).then(() => {
       this.formConfirmed = false;
       this.userEmail;
       this.images = [];
+         this.formConfirmed = false;
     });
 
 
@@ -279,6 +322,7 @@ this.storage.set('localAnnouncements', this.localAnnouncements).then(() => {
       this.images = files;
     }
   }
+  
 
   isValidForm() {
     // Vérifiez si tous les champs obligatoires sont remplis
@@ -310,45 +354,61 @@ this.storage.set('localAnnouncements', this.localAnnouncements).then(() => {
   }
 
   // Modifiez la fonction deleteConfirmedForm pour supprimer un document spécifique de Firestore
-  deleteConfirmedForm(formData: any) {
-    // Vérifiez si formData a un documentId
+ 
+  
+  async deleteConfirmedForm(formData: any) {
     if (formData.documentId) {
-      // Utilisez le nom de la collection spécifiée
-      this.firestore
-        .collection(this.firestoreCollection)
-        .doc(formData.documentId)
-        .delete()
-        .then(() => {
-          // Suppression réussie
-          const index = this.confirmedFormDatas.findIndex((data) => data.documentId === formData.documentId);
-          if (index !== -1) {
-            // Supprimez l'élément du tableau
-            this.confirmedFormDatas.splice(index, 1);
-          }
-            // Supprimez également l'élément du tableau des données stockées localement
-        const localIndex = this.localAnnouncements.findIndex((localData) => localData.documentId === formData.documentId);
+      try {
+        const documentId = formData.documentId;
+
+        await this.firestore.collection(this.firestoreCollection).doc(documentId).delete();
+       
+        // Recherche des documents dans la collection Firestore "ANNONCES" avec un champ "documentId" correspondant
+        const querySnapshot = await this.firestore
+          .collection(this.firestoreCollection, ref => ref.where('documentId', '==', documentId))
+          .get()
+          .toPromise();
+
+        if (querySnapshot && querySnapshot.size > 0) {
+          // Suppression du premier document correspondant (s'il y en a plusieurs)
+          const docToDelete = querySnapshot.docs[0];
+          await docToDelete.ref.delete();
+
+          console.log('Document supprimé avec succès.');
+        } else {
+          console.log('Aucun document correspondant à l\'ID n\'a été trouvé.');
+        }
+
+        // Supprimer d'autres données locales et du tableau
+        const index = this.confirmedFormDatas.findIndex((data) => data.documentId === documentId);
+        if (index !== -1) {
+          this.confirmedFormDatas.splice(index, 1);
+        }
+
+        const localIndex = this.localAnnouncements.findIndex((localData) => localData.documentId === documentId);
         if (localIndex !== -1) {
           this.localAnnouncements.splice(localIndex, 1);
         }
-        })
 
-           // Supprimez l'annonce du stockage local
-    this.storage.get('localAnnouncements').then((data) => {
-      if (data) {
-        const filteredData = data.filter((localData: any) => localData.documentId !== formData.documentId);
-        this.storage.set('localAnnouncements', filteredData).then(() => {
-          console.log('Annonce locale supprimée avec succès.');
-        });
-      }
-    });
-        // Supprimez également l'élément du DOM
-        const elementToRemove = document.querySelector(`.annonce[data-id="${formData.documentId}"]`);
+          // Mettez à jour le stockage local après la suppression
+      this.storage.set('localAnnouncements', this.localAnnouncements).then(() => {
+        console.log('Annonce supprimée localement.');
+      });
+
+        const elementToRemove = document.querySelector(`.annonce[data-id="${documentId}"]`);
         if (elementToRemove) {
           elementToRemove.remove();
         }
+
+        console.log('Document supprimé avec succès.');
+
+        
+      } catch (error) {
+        console.error('Erreur Firebase :', error);
       }
-      
-  }
-      
     }
- 
+  }
+
+
+}
+      
