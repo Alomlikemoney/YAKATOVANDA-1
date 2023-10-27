@@ -50,7 +50,7 @@ export class ProfilPagePage {
             console.error('Adresse e-mail invalide :', userEmailFromAuth);
           }
         }
-      } else {
+      } else   {
         this.userEmail = '';
       }
     });

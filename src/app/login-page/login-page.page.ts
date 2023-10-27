@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage-angular';
 import { AlertController } from '@ionic/angular';
 import { FirebaseError } from 'firebase/app';
 import firebase from 'firebase/compat';
+import { AngularFirestore } from '@angular/fire/compat/firestore'; // Importez AngularFirestore
 
 @Component({
   selector: 'app-login-page',
@@ -20,6 +21,7 @@ export class LoginPagePage {
 
   constructor(
     private afAuth: AngularFireAuth,
+    private firestore: AngularFirestore,
     private router: Router,
     private alertController: AlertController,
     private storage: Storage
@@ -35,7 +37,7 @@ export class LoginPagePage {
   
   async login() {
 
-    const identifier = this.loginWith === 'phone' ? `${this.emailOrPhone}@myapp.com` : this.emailOrPhone;
+    const identifier = this.loginWith === 'phone' ? `${this.emailOrPhone}@yka.com` : this.emailOrPhone;
 
     try {
       if (!this.emailOrPhone || !this.password) {
@@ -55,13 +57,14 @@ export class LoginPagePage {
       } else {
         // C'est un numéro de téléphone (ajout d'un domaine factice)
         userCredential = await this.afAuth.signInWithEmailAndPassword(
-          `${this.emailOrPhone}@myapp.com`,
+          `${this.emailOrPhone}@yka.com`,
           this.password
         );
       }
 
       if (userCredential.user) {
         this.userEmail = userCredential.user.email; 
+        
         
     
            // Récupérez l'utilisateur actuellement connecté
@@ -121,5 +124,20 @@ export class LoginPagePage {
   goToSignupPage() {
     this.router.navigate(['/tabs/signup-page']);
   }
+  resetPassword() {
+    if (!this.emailOrPhone) {
+      this.errorMessage = 'Veuillez entrer votre identifiant (e-mail ou numéro de téléphone) pour réinitialiser le mot de passe.';
+      return;
+    }
+  
+    this.afAuth.sendPasswordResetEmail(this.emailOrPhone)
+      .then(() => {
+        this.errorMessage = 'Un e-mail de réinitialisation de mot de passe a été envoyé à votre adresse.';
+      })
+      .catch((error) => {
+        this.errorMessage = 'Erreur lors de l\'envoi de l\'e-mail de réinitialisation de mot de passe : ' + error.message;
+      });
+  }
+  
 }
 

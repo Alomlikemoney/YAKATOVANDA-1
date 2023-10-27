@@ -23,7 +23,9 @@
   </ion-item>
 
 
-  <ion-button expand="full" (click)="login()">Connexion</ion-button>
+
+  <ion-button  expand="full" (click)="login()">Connexion</ion-button>
+  <ion-button color="danger" expand="full" (click)="resetPassword()">Mot de passe oublié</ion-button>
   <p class="error-message">{{ errorMessage }}</p>
   <p> Vous devez vous connecter pour créer une annonce!</p>
   <p (click)="goToSignupPage()" class="signup-link">Pas encore de compte ?<span style="color: blue;">Inscrivez-vous.</span></p>

@@ -25,6 +25,7 @@ export class SignupPagePage {
   confirmedFormDatas: any[] = [];
   resetForm: any;
   imageUrls: string[] = [];
+  emailOrPhones: any;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -56,12 +57,17 @@ export class SignupPagePage {
         );
       } else {
         userCredential = await this.afAuth.createUserWithEmailAndPassword(
-          `${this.phoneOrEmail}@myapp.com`,
+          this.emailOrPhones =`${this.phoneOrEmail}@yka.com`,
           this.password
         );
       }
 
       if (userCredential.user) {
+
+        // this.firestore.collection('users').doc(userCredential.user.uid).set({
+        //   phoneOrEmail: this.emailOrPhones, // Utilisez l'adresse e-mail ou le numéro de téléphone modifié
+        // });
+        
         await userCredential.user.updateProfile({
           displayName: this.firstName + ' ' + this.lastName,
         });
@@ -71,9 +77,10 @@ export class SignupPagePage {
         await this.firestore.collection(this.firestoreCollection).add({
           firstName: this.firstName,
           lastName: this.lastName,
-          phoneOrEmail: this.phoneOrEmail,
+          phoneOrEmail: this.emailOrPhones,
           gender: this.gender,
           imageUrls: imageUrls,
+
         });
 
         this.presentAlert('Inscription réussie!');
