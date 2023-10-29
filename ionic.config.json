@@ -1,7 +1,8 @@
 {
   "name": "Yakatovanda",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular",
   "id": "6c965693"
