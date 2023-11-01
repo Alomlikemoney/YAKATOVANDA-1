@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AngularFireModule } from '@angular/fire/compat/';
+import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
@@ -14,8 +14,10 @@ import { Server } from 'https';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReversePipe } from './mes-annonces/reverse.pipe';
-    import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import {TabsComponent} from './tabs/tabs.component'
+import { Storage } from '@ionic/storage';
+
 
 export const firebaseConfig = {
   apiKey: "AIzaSyDo1YhZqucB1C9xdiDg_U4fh4_n5KyNpAg",
@@ -37,7 +39,7 @@ export const firebaseConfig = {
     AngularFireStorageModule,
     IonicStorageModule.forRoot(),
     BrowserModule, IonicModule.forRoot(), FormsModule,  AppRoutingModule, IonicModule.forRoot()],
-  providers: [SharedService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [Storage, SharedService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 
 })

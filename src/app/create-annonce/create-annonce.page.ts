@@ -76,6 +76,7 @@ export class CreateAnnoncePage {
     private sharedService: SharedService,
     private annonceService: AnnonceService
   ) {
+   
     // Récupérez l'utilisateur actuellement connecté
     this.afAuth.authState.subscribe((user) => {
       if (user) {

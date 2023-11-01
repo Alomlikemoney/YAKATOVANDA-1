@@ -32,8 +32,11 @@ export class ProfilPagePage {
     //Récupérez l'utilisateur actuellement connecté
   
   }
+
+  
 // infos personnelles
   ngOnInit() {
+    
     this.afAuth.authState.subscribe((user) => {
       if (user) {
         const userEmailFromAuth = user.email;
